@@ -9,16 +9,18 @@ def call(String imageName, String credentialId) {
             passwordVariable: 'DOCKER_PASS'
         )
     ]) {
-        sh '''
-            set +x
-            echo "$DOCKER_PASS" | docker login \
-                --username "$DOCKER_USER" \
-                --password-stdin
+        withEnv(["IMAGE_TO_PUSH=${imageName}"]) {
+            sh '''
+                set +x
 
-            docker push "$IMAGE_TO_PUSH"
+                echo "$DOCKER_PASS" | docker login \
+                    --username "$DOCKER_USER" \
+                    --password-stdin
 
-            docker logout
-        '''
+                docker push "$IMAGE_TO_PUSH"
+                docker logout
+            '''
+        }
     }
 }
 
